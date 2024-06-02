@@ -1,0 +1,30 @@
+[
+  {
+    "subject": "CS",
+    "number": "493",
+    "title": "Cloud Application Development",
+    "term": "Sp24",
+    "instructorId": 1
+  },
+  {
+    "subject": "CS",
+    "number": "344",
+    "title": "Operating Systems I",
+    "term": "W24",
+    "instructorId": 1
+  },
+  {
+    "subject": "BI",
+    "number": "102",
+    "title": "Animal Biology: Genes, Behavior and Evolution of Life",
+    "term": "W24",
+    "instructorId": 2
+  },
+  {
+    "subject": "ENG",
+    "number": "108",
+    "title": "Introduction to Science Fiction and Fantasy",
+    "term": "F23",
+    "instructorId": 3
+  }
+]
