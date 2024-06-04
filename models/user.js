@@ -26,3 +26,33 @@ exports.UserClientFields = [
   'password',
   'role'
 ]
+
+
+
+/*
+ * Get a user by their ID. includePassword specifies whether password is returned in response.
+ */
+async function getUserById(id, includePassword) {
+  let excludedAttributes = includePassword ? [] : ['password']
+  const user = await User.findByPk(id, {
+    attributes: {
+      exclude: excludedAttributes
+    }
+  })
+  return user
+}
+exports.getUserById = getUserById
+
+
+/*
+ * Check user's email and password combination
+ */
+exports.validateCredentials = async function (email, password) {
+  const user = await User.findOne({
+    where: {
+      email: email
+    }
+  })
+  return user !== null && await bcrypt.compare(password, user.password)
+}
+
