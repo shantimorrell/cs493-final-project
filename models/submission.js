@@ -18,8 +18,8 @@ const Submission = sequelize.define('submission', {
 User.hasMany(Submission, { foreignKey: { allowNull: false } })
 Submission.belongsTo(User)
 
-// Assignment.hasMany(Submission, { foreignKey: { allowNull: false } })
-// Submission.belongsTo(Assignment)
+Assignment.hasMany(Submission, { foreignKey: { allowNull: false } })
+Submission.belongsTo(Assignment)
 
 exports.Submission = Submission
 
