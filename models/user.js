@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs")
 
 const sequelize = require('../lib/sequelize')
 const { Assignment } = require('./assignment')
-const { User } = require('./user')
 
 const User = sequelize.define('user', {
     name: { type: DataTypes.STRING, allowNull: false },
@@ -23,5 +22,7 @@ exports.User = User
 
 exports.UserClientFields = [
   'name',
+  'email',
+  'password',
   'role'
 ]

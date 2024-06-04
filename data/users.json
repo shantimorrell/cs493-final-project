@@ -1,42 +1,42 @@
 [
   {
-    "password": "$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
+    "password": "hunter2",
     "role": "instructor",
     "email": "lovelacead@oregonstate.edu",
     "name": "Ada Lovelace"
   },
   {
-    "password": "$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
+    "password": "hunter2",
     "role": "instructor",
     "email": "linnaeusca@oregonstate.edu",
     "name": "Carl Linnaeus"
   },
   {
-    "password": "$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
+    "password": "hunter2",
     "role": "instructor",
     "email": "shelleyma@oregonstate.edu",
     "name": "Mary Shelley"
   },
   {
-    "password": "$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
+    "password": "hunter2",
     "role": "admin",
     "email": "minad@oregonstate.edu",
     "name": "Ad Min"
   },
   {
-    "password": "$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
+    "password": "hunter2",
     "role": "student",
     "email": "asimovis@oregonstate.edu",
     "name": "Isaac Asimov"
   },
   {
-    "password": "$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
+    "password": "hunter2",
     "role": "student",
     "email": "darwinch@oregonstate.edu",
     "name": "Charles Darwin"
   },
   {
-    "password": "$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
+    "password": "hunter2",
     "role": "student",
     "email": "turingal@oregonstate.edu",
     "name": "Alan Turing"

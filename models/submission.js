@@ -5,10 +5,10 @@ const { Assignment } = require('./assignment')
 const { User } = require('./user')
 
 const Submission = sequelize.define('submission', {
-    timestamp: { Type: DataTypes.DATE, allowNull: false },
-    file: { Type: DataTypes.TEXT, allowNull: false },
+    timestamp: { type: DataTypes.DATE, allowNull: false },
+    file: { type: DataTypes.TEXT, allowNull: false },
     grade: {
-        Type: DataTypes.FLOAT, validate: {
+        type: DataTypes.FLOAT, validate: {
             min: 0
         },
         allowNull: true
@@ -18,8 +18,8 @@ const Submission = sequelize.define('submission', {
 User.hasMany(Submission, { foreignKey: { allowNull: false } })
 Submission.belongsTo(User)
 
-Assignment.hasMany(Submission, { foreignKey: { allowNull: false } })
-Submission.belongsTo(Assignment)
+// Assignment.hasMany(Submission, { foreignKey: { allowNull: false } })
+// Submission.belongsTo(Assignment)
 
 exports.Submission = Submission
 
