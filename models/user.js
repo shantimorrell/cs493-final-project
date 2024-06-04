@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize')
+const { DataTypes, UniqueConstraintError, ValidationError } = require('sequelize')
 const bcrypt = require("bcryptjs")
 
 const sequelize = require('../lib/sequelize')
@@ -20,13 +20,33 @@ const User = sequelize.define('user', {
 
 exports.User = User
 
-exports.UserClientFields = [
+const UserClientFields = [
   'name',
   'email',
   'password',
   'role'
 ]
+exports.UserClientFields = UserClientFields
 
+/*
+ * Insert a new user, checking to see if that email already exists or the request body
+ * doesn't contain required name, email, and password fields
+ */
+exports.insertNewUser = async function (req, res, next) {
+  try {
+    const user = await User.create(req.body, UserClientFields)
+    res.status(201).send({ id: user.id })
+  } catch (e) {
+    if (e instanceof UniqueConstraintError) {
+      res.status(400).send({ error: "An account already exists with that email address" })
+    }
+    else if (e instanceof ValidationError) {
+      res.status(400).send({ error: "Request body must contain a name, email, and password" })
+    } else {
+      next(e)
+    }
+  }
+}
 
 
 /*
@@ -56,3 +76,55 @@ exports.validateCredentials = async function (email, password) {
   return user !== null && await bcrypt.compare(password, user.password)
 }
 
+
+/*
+ * Require the user is an admin, return error if unauthorized
+ */
+exports.requireAdmin = async function (req, res, next) {
+  try {
+    if (req.user && await isAdmin(req.user)) {
+      // User is admin, continue
+      next()
+    } else {
+      // User is not admin
+      res.status(403).send({
+        error: "You must be an admin user to perform this action"
+      })
+    }
+  } catch (e) {
+    next(e)
+  }
+}
+
+
+/*
+ * Require the user matches the userId in the request params, return error if unauthorized
+ */
+exports.requireUserMatchesParams = async function (req, res, next) {
+  try {
+    if (await isAdmin(req.user) || (req.user == req.params.userId)) {
+      // Authorized user: either admin or matching user
+      next()
+    } else {
+      // Unauthorized: user is not admin and is trying to access another user's info
+      res.status(403).send({
+        error: "Not authorized to access the specified resource"
+      })
+    }
+  } catch (e) {
+    next(e)
+  }
+}
+
+
+/*
+ * Checks whether a user has admin privileges
+ */
+async function isAdmin(userId) {
+  const user = await User.findByPk(userId)
+  if (user && user.role === 'admin') {
+    return true
+  } else {
+    return false
+  }
+}

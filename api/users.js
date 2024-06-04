@@ -1,5 +1,5 @@
 const { Router } = require('express')
-const { getUserById, validateCredentials, User } = require('../models/user')
+const { getUserById, validateCredentials, User, insertNewUser, requireAdmin, requireUserMatchesParams } = require('../models/user')
 const { generateAuthToken, requireAuthentication } = require('../lib/auth')
 
 const router = Router()
@@ -38,20 +38,44 @@ router.post('/login', async function (req, res, next) {
 
 
 /*
- * Route to get user's information by id.
+ * Route to add new user.
  */
-router.get("/:userId", requireAuthentication, async function (req, res, next) {
-  try {
-    const user = await getUserById(req.params.userId, false)
-    if (user) {
-      res.status(200).send(user)
+router.post("/", 
+  async function(req, res, next) {
+    if (!req.body.role || req.body.role === 'student') {
+      // No authentication necessary to create student user (default role is student if no role specified)
+      await insertNewUser(req, res, next)
     } else {
+      // Require admin authentication for creating user with admin or instructor privileges
       next()
     }
-  } catch(e) {
-    next(e)
+  }, 
+  requireAuthentication, 
+  requireAdmin,
+  insertNewUser
+)
+
+
+/*
+ * Route to get user's information by id.
+ */
+router.get(
+  "/:userId", 
+  requireAuthentication, 
+  requireUserMatchesParams, 
+  async function (req, res, next) {
+    try {
+      const user = await getUserById(req.params.userId, false)
+      if (user) {
+        res.status(200).send(user)
+      } else {
+        next()
+      }
+    } catch(e) {
+      next(e)
+    }
   }
-})
+)
 
 
 module.exports = router
