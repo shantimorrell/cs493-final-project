@@ -118,11 +118,46 @@ exports.requireUserMatchesParams = async function (req, res, next) {
 
 
 /*
+ * Require the user is an instructor matching the instructorId in the request body 
+ * or user is an admin, return error if unauthorized
+ */
+exports.requireInstructorMatchesBody = async function (req, res, next) {
+  try {
+    // TODO: ONCE COURSES ARE IMPLEMENTED, ENSURE MATCHING INSTRUCTOR ID
+    if (await isAdmin(req.user) || (await isInstructor(req.user))) {// && req.user == await getCourseById(req.body.courseId).instructorId)) {
+      // Authorized user: either admin or matching instructor
+      next()
+    } else {
+      // Unauthorized: user is not admin or matching instructor and is trying to access another user's info
+      res.status(403).send({
+        error: "Not authorized to access the specified resource"
+      })
+    }
+  } catch (e) {
+    next(e)
+  }
+}
+
+
+/*
  * Checks whether a user has admin privileges
  */
 async function isAdmin(userId) {
   const user = await User.findByPk(userId)
   if (user && user.role === 'admin') {
+    return true
+  } else {
+    return false
+  }
+}
+
+
+/*
+ * Checks whether a user has instructor privileges
+ */
+async function isInstructor(userId) {
+  const user = await User.findByPk(userId)
+  if (user && user.role === 'instructor') {
     return true
   } else {
     return false
