@@ -203,6 +203,61 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "assignments",
+			"item": [
+				{
+					"name": "Get an assignment's info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/assignments/:assignmentid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments",
+								":assignmentid"
+							],
+							"variable": [
+								{
+									"key": "assignmentid",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add assignment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"CS 493 Final Project\",\n    \"due\": \"2024-06-10T23:59:59.000Z\",\n    \"points\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/assignments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {
@@ -210,7 +265,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTcxNzUyMDg2OCwiZXhwIjoxNzE3NjA3MjY4fQ.kioph9Y1RvyqFKLmEg5XY9lS2wT8mChHPQa83xSmmZc",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcxNzcyNDI5NSwiZXhwIjoxNzE3ODEwNjk1fQ.lyP7Gcc_fyoatc4fsLoB4MNVBpQ-VBkczPwBIQzM5pE",
 				"type": "string"
 			}
 		]

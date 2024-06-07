@@ -21,7 +21,7 @@ router.post('/login', async function (req, res, next) {
     if (authenticated) {
       // User's password and email combination are correct, get user and generate token
       const user = await User.findOne({ where: { email: req.body.email } })
-      const token = generateAuthToken(user.id)
+      const token = generateAuthToken(user.id, user.role)
       res.status(200).send({
         token: token
       })
@@ -64,6 +64,7 @@ router.get(
   requireAuthentication, 
   requireUserMatchesParams, 
   async function (req, res, next) {
+    console.log("req.user", req.user, req.role)
     try {
       const user = await getUserById(req.params.userId, false)
       if (user) {
