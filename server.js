@@ -24,6 +24,27 @@ app.use(morgan('dev'))
 
 app.use(express.json())
 
+app.get('/media/submissions/:filename', requireAuthentication, async function (req, res, next) {
+    try {
+        submission = await Submission.findOne({ where: { file: filename } })
+        if (submission) {
+            assignment = await Assignment.findByPk(submission.assignmentId)
+            course = await Course.findByPk(assignment.courseId)
+            instructor = course.instructorId
+            student = submission.userId
+            if (req.user === student || req.user === instructor || req.role === 'admin') {
+                res.sendFile(`${__dirname}/data/submissions/${filename}`)
+            }
+        } else {
+            res.status(404).send({
+                err: "Requested resource not found"
+            })
+        }
+    } catch (e) {
+        next(e)
+    }
+})
+
 /*
  * All routes for the API are written in modules in the api/ directory.  The
  * top-level router lives in api/index.js.  That's what we include here, and
