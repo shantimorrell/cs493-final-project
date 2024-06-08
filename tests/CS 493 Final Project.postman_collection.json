@@ -232,6 +232,54 @@
 					"response": []
 				},
 				{
+					"name": "Delete an assignment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/assignments/:assignmentid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments",
+								":assignmentid"
+							],
+							"variable": [
+								{
+									"key": "assignmentid",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an assignment - nonexistent id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/assignments/:assignmentid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments",
+								":assignmentid"
+							],
+							"variable": [
+								{
+									"key": "assignmentid",
+									"value": "1000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Add assignment",
 					"request": {
 						"method": "POST",
@@ -256,6 +304,105 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Update assignment",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Assignment 1\",\n    \"points\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/assignments/:assignmentid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments",
+								":assignmentid"
+							],
+							"variable": [
+								{
+									"key": "assignmentid",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update assignment - invalid fields",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"unknownfield\": \"value\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/assignments/:assignmentid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments",
+								":assignmentid"
+							],
+							"variable": [
+								{
+									"key": "assignmentid",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update assignment - nonexistent id",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Testing\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/assignments/:assignmentid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments",
+								":assignmentid"
+							],
+							"variable": [
+								{
+									"key": "assignmentid",
+									"value": "1000"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -265,7 +412,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcxNzcyNDI5NSwiZXhwIjoxNzE3ODEwNjk1fQ.lyP7Gcc_fyoatc4fsLoB4MNVBpQ-VBkczPwBIQzM5pE",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE3ODgyNDk1LCJleHAiOjE3MTc5Njg4OTV9.tNQZS2155QOUez2GrdpFjG5VeJWdYPwDdCNOpRjek2k",
 				"type": "string"
 			}
 		]

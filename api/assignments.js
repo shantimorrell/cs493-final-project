@@ -43,7 +43,6 @@ router.post(
 )
 
 
-// TODO: NOT YET COMPLETE + TESTED
 /*
  * Route to update data for an assignment.
  */
@@ -53,13 +52,45 @@ router.patch(
   requireInstructorMatchesBody, 
   async function (req, res, next) {
     const assignmentId = req.params.assignmentId
+
+    // Check request body is present and there is at least one matching field, otherwise return error
+    const matchingFields = Object.keys(req.body)?.filter(value => AssignmentClientFields.includes(value));
+    if (!req.body || matchingFields.length === 0) {
+      res.status(400).send({ error: "Request must contain fields to update: courseId, title, points, or due" })
+    }
+
     try {
       const result = await Assignment.update(req.body, {
         where: { id: assignmentId },
         fields: AssignmentClientFields
       })
       if (result[0] > 0) {
+        // Assignment successfully updated
         res.status(200).send()
+      } else {
+        // No assignment with specified id exists, return 404 error
+        next()
+      }
+    } catch (e) {
+      next(e)
+    }
+  }
+)
+
+
+/*
+ * Route to delete an assignment.
+ */
+router.delete(
+  '/:assignmentId', 
+  requireAuthentication, 
+  requireInstructorMatchesBody, 
+  async function (req, res, next) {
+    const assignmentId = req.params.assignmentId
+    try {
+      const result = await Assignment.destroy({ where: { id: assignmentId }})
+      if (result > 0) {
+        res.status(204).send()
       } else {
         next()
       }
