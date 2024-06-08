@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const sequelize = require
 const { Course } = require('../models/course')
-const courses = require('../data/courses.json')
+//const courses = require('../data/courses.json')
 
 const router = Router()
 
@@ -9,11 +9,16 @@ const router = Router()
  * Route to return a list of courses.
  */
 router.get('/', async function (req, res) {
+    const courses = await Course.findAll()
     /*
     * Compute page number based on optional query string parameter `page`.
     * Make sure page is within allowed bounds.
     */
     let page = parseInt(req.query.page) || 1
+    let subject = req.query.subject
+    let number = req.query.number
+    let term = req.query.term
+
     const numPerPage = 10
     const lastPage = Math.ceil(courses.length / numPerPage)
     page = page > lastPage ? lastPage : page
@@ -40,7 +45,20 @@ router.get('/', async function (req, res) {
     /*
      * Construct and send response.
      */
+
+    let w = {}
+    if (subject) {
+        w.subject = subject
+    }
+    if (number) {
+        w.number = number
+    }
+    if (term) {
+        w.term = term
+    }
+
     const courses1 = await Course.findAll({
+        where: w,
         limit: numPerPage,
         offset: start
     })
