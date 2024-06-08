@@ -68,4 +68,27 @@ router.get('/', async function (req, res) {
     })
 })
 
+router.get('/:id', async function (req, res, next) {
+    const courseId = parseInt(req.params.courseId)
+    const courseId1 = await Course.findByPk(courseId)
+    if (courseId1) {
+        res.status(200).send(courseId1)
+    } else {
+        next()
+    }
+})
+
+router.post('/', async function (req, res, next) {
+    try {
+        const course = await Course.create(req.body)
+        console.log("Course: ", course.toJSON())
+        res.status(200).send({
+            id: course.id
+        })
+    } catch (err) {
+        next(err)
+    }
+
+})
+
 module.exports = router
