@@ -4,6 +4,8 @@ const assignmentsRouter = require('./assignments')
 const coursesRouter = require('./courses')
 const submissionsRouter = require('./submissions')
 const usersRouter = require('./users')
+const redis = require('redis')
+const { redisClient } = require('../server')
 
 const router = Router()
 

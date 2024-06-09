@@ -1,4 +1,4 @@
-const { Router } = require('express')
+const { Router, application } = require('express')
 const sequelize = require
 const { Course } = require('../models/course')
 const { Enrollment } = require('../models/enrollment')
