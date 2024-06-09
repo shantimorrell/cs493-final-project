@@ -2,6 +2,7 @@ const { Router } = require('express')
 const sequelize = require
 const { Course } = require('../models/course')
 const { Enrollment } = require('../models/enrollment')
+const { User } = require('../models/user')
 const { validateAgainstSchema } = require('../lib/validation')
 
 const router = Router()
@@ -100,6 +101,21 @@ router.get('/:id/students', async function (req, res) {
     })
 })
 
+router.get('/:id/roster', async function (req, res) {
+    const courseId = parseInt(req.params.id)
+    const enrollment = await Enrollment.findAll({ where: { courseId: courseId } })
+    const students = await User.findByPk()
+
+    let csv = "id, studentId, courseId, "
+    for (let i = 0; i < enrollment.length; i++) {
+        csv += `${enrollment[i].id}, `
+    }
+    res.status(200).send({
+        csv: csv
+    })
+
+})
+
 router.post('/', async function (req, res, next) {
     const request = await req.body
     if (validateAgainstSchema(request, courseSchema)) {
@@ -146,7 +162,6 @@ router.post('/:id/students', async function (req, res, next) {
                 error: "course not found"
             })
         }
-
     } else {
         res.status(400).send({
             error: "body is not a valid object"
