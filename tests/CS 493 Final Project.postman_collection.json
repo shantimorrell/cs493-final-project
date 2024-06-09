@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "71055fa0-7617-4faa-a2ae-6e0451adba28",
+		"_postman_id": "fc51b4c2-fe87-4a96-9dc4-ac0bf6c5c3f7",
 		"name": "CS 493 Final Project",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "34417828"
+		"_exporter_id": "34250222"
 	},
 	"item": [
 		{
@@ -14,6 +14,19 @@
 					"item": [
 						{
 							"name": "Login student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"JWT\", jsonData.token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -41,6 +54,19 @@
 						},
 						{
 							"name": "Login instructor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"JWT\", jsonData.token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -68,6 +94,19 @@
 						},
 						{
 							"name": "Login admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"JWT\", jsonData.token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -171,6 +210,168 @@
 									],
 									"path": [
 										"users"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "submissions",
+					"item": [
+						{
+							"name": "Post submission",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userId",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/nurua/Documents/CS493/assignment-4-Cerberus168/test_images/armadillo_lizard.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:assignmentId/submissions",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":assignmentId",
+										"submissions"
+									],
+									"variable": [
+										{
+											"key": "assignmentId",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "View submissions for an assignment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:assignmentId/submissions",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":assignmentId",
+										"submissions"
+									],
+									"variable": [
+										{
+											"key": "assignmentId",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Download submission",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/media/submissions/d4a05a478347b54f70f67d721dae7fe4.jpg",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"media",
+										"submissions",
+										"d4a05a478347b54f70f67d721dae7fe4.jpg"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Request",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"grade\": 45\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/submissions/:submissionId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"submissions",
+										":submissionId"
+									],
+									"variable": [
+										{
+											"key": "submissionId",
+											"value": "1"
+										}
 									]
 								}
 							},
@@ -437,6 +638,17 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "localhost:3001",
+			"type": "string"
+		},
+		{
+			"key": "JWT",
+			"value": ""
 		}
 	]
 }
