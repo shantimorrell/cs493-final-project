@@ -22,5 +22,11 @@
     "due": "2024-06-10T23:59:59.999Z",
     "points": 125.0,
     "courseId": 4
+  },
+  {
+    "title": "Write a Whole Novel2",
+    "due": "2024-06-10T23:59:59.999Z",
+    "points": 125.0,
+    "courseId": 1
   }
 ]

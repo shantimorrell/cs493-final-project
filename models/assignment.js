@@ -5,7 +5,8 @@ const sequelize = require('../lib/sequelize')
 const Assignment = sequelize.define('assignment', {
   title: { type: DataTypes.STRING, allowNull: false },
   points: { type: DataTypes.INTEGER, allowNull: true },
-  due: { type: DataTypes.DATE, allowNull: false }
+  due: { type: DataTypes.DATE, allowNull: false },
+  courseId: { type: DataTypes.INTEGER, allowNull: false },
 })
 
 
@@ -18,7 +19,8 @@ exports.Assignment = Assignment
 const AssignmentClientFields = [
   'title',
   'points',
-  'due'
+  'due',
+  'courseId'
 ]
 exports.AssignmentClientFields = AssignmentClientFields
 

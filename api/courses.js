@@ -3,6 +3,7 @@ const sequelize = require
 const { Course } = require('../models/course')
 const { Enrollment } = require('../models/enrollment')
 const { User } = require('../models/user')
+const { Assignment } = require('../models/assignment')
 const { validateAgainstSchema } = require('../lib/validation')
 
 const router = Router()
@@ -39,10 +40,6 @@ router.get('/', async function (req, res) {
     page = page > lastPage ? lastPage : page
     page = page < 1 ? 1 : page
 
-    /*
-    * Calculate starting and ending indices of courses on requested page and
-    * slice out the corresponsing sub-array of courses.
-    */
     const start = (page - 1) * numPerPage
     const end = start + numPerPage
     const pageCourses = courses.slice(start, end)
@@ -56,10 +53,6 @@ router.get('/', async function (req, res) {
         links.prevPage = `/courses?page=${page - 1}`
         links.firstPage = '/courses?page=1'
     }
-
-    /*
-     * Construct and send response.
-     */
 
     let w = {}
     if (subject) {
@@ -87,33 +80,91 @@ router.get('/:id', async function (req, res, next) {
     const courseId = parseInt(req.params.id)
     const course = await Course.findByPk(courseId)
     if (course) {
+        if (course) {
         res.status(200).send(course)
     } else {
         next()
     }
+    } else {
+        res.status(400).send({
+            error: "no course with that id was found"
+        })
+    }
+    
 })
 
 router.get('/:id/students', async function (req, res) {
     const courseId = parseInt(req.params.id)
     const enrollment = await Enrollment.findAll({ where: { courseId: courseId } })
-    res.status(200).send({
-        students: enrollment
-    })
+    if (enrollment.length > 0) {
+        const users = await User.findAll()
+        const id = []
+        for (let i = 0; i < enrollment.length; i++) {
+            id[id.length] = enrollment[i].studentId
+        }
+        const students = isStudent(id, users)
+        res.status(200).send({
+            students: students
+        })
+    } else {
+        res.status(404).send({
+            error: "no course with that id found"
+        })
+    }
 })
 
+function isStudent(num, arr) {
+    let students = []
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < num.length; j++) {
+            if (arr[i].id == num[j]) {
+                students[students.length] = arr[i]
+            } else {
+                //console.log("num: ", num[j], "arr: ", arr[i].id)
+            }
+        }
+    }
+    return students
+}
+
+//validate user
 router.get('/:id/roster', async function (req, res) {
     const courseId = parseInt(req.params.id)
     const enrollment = await Enrollment.findAll({ where: { courseId: courseId } })
-    const students = await User.findByPk()
-
-    let csv = "id, studentId, courseId, "
-    for (let i = 0; i < enrollment.length; i++) {
-        csv += `${enrollment[i].id}, `
+    if (enrollment.length > 0) {
+        const users = await User.findAll()
+        const id = []
+        for (let i = 0; i < enrollment.length; i++) {
+            id[id.length] = enrollment[i].studentId
+        }
+        const students = isStudent(id, users)
+        let csv = "name, studentId, email \n"
+        for (let i = 0; i < students.length; i++) {
+            csv += `${students[i].name}, ${students[i].id}, ${students[i].email}\n`
+        }
+        res.setHeader('Content-Type', 'text/csv')
+        res.setHeader('Content-Disposition', 'attachment; filename-roster.csv')
+        res.status(200).send(csv)
+    } else {
+        res.status(404).send({
+            error: "no course with that id found"
+        })
     }
-    res.status(200).send({
-        csv: csv
-    })
 
+})
+
+router.get('/:id/assignments', async function (req, res) {
+    const courseId = parseInt(req.params.id)
+    const assignment = await Assignment.findAll({ where: { courseId: courseId } })
+    if (assignment.length > 0) {
+        res.status(200).send({
+            assignments: assignment
+        })
+    } else {
+        res.status(400).send({
+            error: "no course found with that id"
+        })
+    }
 })
 
 router.post('/', async function (req, res, next) {
