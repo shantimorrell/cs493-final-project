@@ -1,0 +1,21 @@
+Get to Directory:
+cd MyDocuments/CS493/final-project-team-37
+
+Launch MYSQL server:
+docker run -d --name mysql-server -p 3306:3306 -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" -e "MYSQL_DATABASE=tarpaulin" -e "MYSQL_USER=hackerman" -e "MYSQL_PASSWORD=12345" mysql
+
+Launch redis server:
+docker run -d --name redis-server -p 6379:6379 redis
+
+set environment variables:
+export MYSQL_DATABASE="tarpaulin"
+export MYSQL_USER="hackerman"
+export MYSQL_PASSWORD="12345"
+
+initialise database:
+npm run initdb
+
+start server:
+npm run dev
+OR
+npm start

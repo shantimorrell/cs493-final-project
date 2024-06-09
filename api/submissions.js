@@ -6,12 +6,12 @@ const { Enrollment } = require('../models/enrollment')
 const { ValidationError } = require('sequelize')
 const { requireAuthentication } = require('../lib/auth')
 
-const router = Router()
+const router = Router() 
 
 /*
  * Only grades can be updated, as allowing any other field to be modified
  * constitutes a potential security/ethics vulnerability and lacks a clear,
- * legitimate use case.
+ * legitimate use case. 
  */
 router.patch("/:submissionId", requireAuthentication, async function (req, res, next) {
     try {
@@ -19,10 +19,10 @@ router.patch("/:submissionId", requireAuthentication, async function (req, res, 
         const assignment = await Assignment.findByPk(submission.assignmentId)
         const course = await Course.findByPk(assignment.courseId)
         const instructor = course.instructorId
-        if (((req.user == instructor && req.role == 'instructor') || req.role == 'admin') && req.body.grade) {
+        if (((req.user == instructor && req.role === 'instructor') || req.role === 'admin') && req.body.grade) {
             try {
                 const result = await Submission.update(req.body, {
-                    where: { id: submissionId },
+                    where: { id: req.params.submissionId },
                     fields: ['grade']
                 })
                 if (result[0] > 0) {
@@ -42,3 +42,5 @@ router.patch("/:submissionId", requireAuthentication, async function (req, res, 
         next(e)
     }
 })
+
+module.exports = router

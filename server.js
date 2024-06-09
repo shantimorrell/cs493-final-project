@@ -17,9 +17,15 @@ const sequelize = require('./lib/sequelize')
 const app = express()
 const port = process.env.PORT || 8000
 
+const { requireAuthentication } = require('./lib/auth')
+
 const redis = require('redis')
 const redisHost = process.env.REDIS_HOST || "localhost"
 const redisPort = process.env.REDIS_PORT || 6379
+
+const { Submission } = require('./models/submission')
+const { Assignment } = require('./models/assignment')
+const { Course } = require('./models/course')
 
 const redisClient = redis.createClient({
     url: `redis://${redisHost}:${redisPort}`
@@ -73,14 +79,14 @@ app.use(express.json())
 
 app.get('/media/submissions/:filename', requireAuthentication, async function (req, res, next) {
     try {
-        submission = await Submission.findOne({ where: { file: filename } })
+        submission = await Submission.findOne({ where: { file: req.params.filename } })
         if (submission) {
             assignment = await Assignment.findByPk(submission.assignmentId)
             course = await Course.findByPk(assignment.courseId)
             instructor = course.instructorId
             student = submission.userId
             if (req.user === student || req.user === instructor || req.role === 'admin') {
-                res.sendFile(`${__dirname}/data/submissions/${filename}`)
+                res.sendFile(`${__dirname}/data/submission_files/${req.params.filename}`)
             }
         } else {
             res.status(404).send({
