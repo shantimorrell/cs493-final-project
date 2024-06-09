@@ -17,6 +17,53 @@ const sequelize = require('./lib/sequelize')
 const app = express()
 const port = process.env.PORT || 8000
 
+const redis = require('redis')
+const redisHost = process.env.REDIS_HOST || "localhost"
+const redisPort = process.env.REDIS_PORT || 6379
+
+const redisClient = redis.createClient({
+    url: `redis://${redisHost}:${redisPort}`
+})
+
+const rateLimits = 5
+const rateLimitTime = 60000
+async function rateLimit(req, res, next) {
+    const ip = req.ip
+    let tokenBucket
+    try {
+        tokenBucket = await redisClient.hGetAll(ip)
+    } catch(e) {
+        next()
+        return
+    }
+    tokenBucket = {
+        tokens: parseFloat(tokenBucket.tokens) || rateLimits,
+        last: parseInt(tokenBucket.last) || Date.now()
+    }
+
+    const timestamp = Date.now()
+    const ellapsedTime = timestamp - tokenBucket.last
+    const refreshRate = rateLimits / rateLimitTime
+    tokenBucket.tokens += ellapsedTime * refreshRate
+    tokenBucket.tokens = Math.min(rateLimits, tokenBucket.tokens)
+    tokenBucket.last = timestamp
+
+    if (tokenBucket.tokens >= 1) {
+        console.log("TOKENS: ", tokenBucket.tokens)
+        tokenBucket.tokens -= 1
+        await redisClient.hSet(ip, [
+            ['tokens', tokenBucket.tokens],
+            ['last', tokenBucket.last]
+        ])
+        next()
+    } else {
+        res.status(429).send({
+            error: "too many actions per minute"
+        })
+    }
+}
+app.use(rateLimit)
+
 /*
  * Morgan is a popular request logger.
  */
@@ -52,8 +99,13 @@ app.use('*', function (err, req, res, next) {
  * Start the API server listening for requests after establishing a connection
  * to the MySQL server.
  */
+
 sequelize.sync().then(function () {
-    app.listen(port, function () {
-        console.log("== Server is running on port", port)
+    redisClient.connect().then(() => {
+        app.listen(port, function () {
+            console.log("== Server is running on port", port)
+        })
     })
 })
+
+exports.redisClient = redisClient

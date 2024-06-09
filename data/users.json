@@ -1,0 +1,44 @@
+[
+  {
+    "password": "hunter2",
+    "role": "instructor",
+    "email": "lovelacead@oregonstate.edu",
+    "name": "Ada Lovelace"
+  },
+  {
+    "password": "hunter2",
+    "role": "instructor",
+    "email": "linnaeusca@oregonstate.edu",
+    "name": "Carl Linnaeus"
+  },
+  {
+    "password": "hunter2",
+    "role": "instructor",
+    "email": "shelleyma@oregonstate.edu",
+    "name": "Mary Shelley"
+  },
+  {
+    "password": "hunter2",
+    "role": "admin",
+    "email": "minad@oregonstate.edu",
+    "name": "Ad Min"
+  },
+  {
+    "password": "hunter2",
+    "role": "student",
+    "email": "asimovis@oregonstate.edu",
+    "name": "Isaac Asimov"
+  },
+  {
+    "password": "hunter2",
+    "role": "student",
+    "email": "darwinch@oregonstate.edu",
+    "name": "Charles Darwin"
+  },
+  {
+    "password": "hunter2",
+    "role": "student",
+    "email": "turingal@oregonstate.edu",
+    "name": "Alan Turing"
+  }
+]

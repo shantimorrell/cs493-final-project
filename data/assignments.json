@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Assignment 1",
+    "due": "2024-04-22T23:59:59.999Z",
+    "points": 100.0,
+    "courseId": 1
+  },
+  {
+    "title": "Read/Write File in .cvx Format",
+    "due": "2024-04-05T23:59:59.999Z",
+    "points": 50.0,
+    "courseId": 2
+  },
+  {
+    "title": "Photograph a Creature",
+    "due": "2024-05-31T23:59:59.999Z",
+    "points": 20.0,
+    "courseId": 3
+  },
+  {
+    "title": "Write a Whole Novel",
+    "due": "2024-06-10T23:59:59.999Z",
+    "points": 125.0,
+    "courseId": 4
+  },
+  {
+    "title": "Write a Whole Novel2",
+    "due": "2024-06-10T23:59:59.999Z",
+    "points": 125.0,
+    "courseId": 1
+  }
+]
