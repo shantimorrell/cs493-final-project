@@ -128,9 +128,13 @@ exports.requireUserMatchesParams = async function (req, res, next) {
  */
 exports.requireInstructorMatchesBody = async function (req, res, next) {
   try {
+    const course = await Course.findByPk(req.body.courseId)
+    if (!course) {
+      res.status(400).send({ error: "courseId is not valid" })
+    }
     if (
       req.role === "admin" ||
-      (req.role === "instructor" && (await Course.findByPk(req.body.courseId)).instructorId === req.user)
+      (req.role === "instructor" && course.instructorId === req.user)
     ) {
       // Authorized user: either admin or matching instructor
       next()
