@@ -1,9 +1,23 @@
 const { Router } = require('express')
 const sequelize = require
 const { Course } = require('../models/course')
-//const courses = require('../data/courses.json')
+const { Enrollment } = require('../models/enrollment')
+const { validateAgainstSchema } = require('../lib/validation')
 
 const router = Router()
+
+courseSchema = {
+    subject: { required: true },
+    number: { required: true },
+    title: { required: true },
+    term: { required: true },
+    instructorId: { required: true }
+}
+
+enrollmentSchema = {
+    add: { required: true },
+    delete: { required: true }
+}
 
 /*
  * Route to return a list of courses.
@@ -57,38 +71,123 @@ router.get('/', async function (req, res) {
         w.term = term
     }
 
-    const courses1 = await Course.findAll({
+    const courseList = await Course.findAll({
         where: w,
         limit: numPerPage,
         offset: start
     })
 
     res.status(200).send({
-        courses: courses1
+        courses: courseList
     })
 })
 
 router.get('/:id', async function (req, res, next) {
-    const courseId = parseInt(req.params.courseId)
-    const courseId1 = await Course.findByPk(courseId)
-    if (courseId1) {
-        res.status(200).send(courseId1)
+    const courseId = parseInt(req.params.id)
+    const course = await Course.findByPk(courseId)
+    if (course) {
+        res.status(200).send(course)
     } else {
         next()
     }
 })
 
-router.post('/', async function (req, res, next) {
-    try {
-        const course = await Course.create(req.body)
-        console.log("Course: ", course.toJSON())
-        res.status(200).send({
-            id: course.id
-        })
-    } catch (err) {
-        next(err)
-    }
+router.get('/:id/students', async function (req, res) {
+    const courseId = parseInt(req.params.id)
+    const enrollment = await Enrollment.findAll({ where: { courseId: courseId } })
+    res.status(200).send({
+        students: enrollment
+    })
+})
 
+router.post('/', async function (req, res, next) {
+    const request = await req.body
+    if (validateAgainstSchema(request, courseSchema)) {
+        const course = await Course.create(request)
+        console.log("course: ", course.toJSON())
+        res.status(201).send({
+            id: course.id,
+            links: {
+                course: `/course/${course.id}`
+            }
+        })
+    } else {
+        res.status(400).send({
+            error: "body is not a valid course object"
+        })
+    }
+})
+
+router.post('/:id/students', async function (req, res, next) {
+    const request = await req.body
+    if (validateAgainstSchema(request, enrollmentSchema)) {
+        const courseId = parseInt(req.params.id)
+        const add = request.add
+        const remove = request.delete
+        const course = await Course.findByPk(courseId)
+        if (course) {
+            for (let i = 0; i < add.length; i++) {
+                await Enrollment.create({
+                    studentId: add[i],
+                    courseId: courseId
+                })
+            }
+            for (let i = 0; i < remove.length; i++) {
+                await Enrollment.destroy({
+                    where: {
+                        studentId: remove[i],
+                        courseId: courseId
+                    }
+                })
+            }
+            res.status(200).send()
+        } else {
+            res.status(404).send({
+                error: "course not found"
+            })
+        }
+
+    } else {
+        res.status(400).send({
+            error: "body is not a valid object"
+        })
+    }
+})
+
+router.patch('/:id', async function (req, res, next) {
+    const request = await req.body
+    const courseId = parseInt(req.params.id)
+    const course = await Course.findByPk(courseId)
+    if (course) {
+        if (validateAgainstSchema(request, courseSchema)) {
+            const result = await Course.update(request, {
+                where: { id: course.id }
+            })
+            if (result[0] > 0) {
+                res.status(204).send()
+            }
+        } else {
+            res.status(400).send({
+                error: "body is not valid course object"
+            })
+        }
+    } else {
+        next()
+    }
+})
+
+router.delete('/:id', async function (req, res, next) {
+    const courseId = parseInt(req.params.id)
+    const course = await Course.findByPk(courseId)
+    if (course) {
+        const result = await Course.destroy({ where: { id: course.id } })
+        if (result > 0) {
+            res.status(204).send()
+        }
+        console.log(result)
+    } else {
+        next()
+    }
 })
 
 module.exports = router
