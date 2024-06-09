@@ -5,7 +5,6 @@ const { Assignment } = require('./assignment')
 const { User } = require('./user')
 
 const Submission = sequelize.define('submission', {
-    timestamp: { type: DataTypes.DATE, allowNull: false },
     file: { type: DataTypes.TEXT, allowNull: false },
     grade: {
         type: DataTypes.FLOAT, validate: {
