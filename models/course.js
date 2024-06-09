@@ -7,7 +7,6 @@ const Course = sequelize.define("course", {
     number: {type: DataTypes.STRING, allowNull: false},
     title: {type: DataTypes.STRING, allowNull: false},
     term: {type: DataTypes.STRING, allowNull: false},
-    instructorId: {type: DataTypes.STRING, allowNull: false},
 })
 
 exports.Course = Course

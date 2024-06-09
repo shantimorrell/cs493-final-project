@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs")
 
 const sequelize = require('../lib/sequelize')
 const { Assignment } = require('./assignment')
+const { Course } = require('./course')
 
 const User = sequelize.define('user', {
     name: { type: DataTypes.STRING, allowNull: false },
@@ -16,6 +17,10 @@ const User = sequelize.define('user', {
     },
     role: { type: DataTypes.ENUM('admin', 'instructor', 'student'), allowNull: false, defaultValue: 'student' }
 })
+
+
+User.hasMany(Course)
+Course.belongsTo(User, { foreignKey: { allowNull: false, name: "instructorId" } })
 
 
 exports.User = User
@@ -118,17 +123,23 @@ exports.requireUserMatchesParams = async function (req, res, next) {
 
 
 /*
- * Require the user is an instructor matching the instructorId in the request body 
- * or user is an admin, return error if unauthorized
+ * Require the user is an admin, or an instructor matching the instructorId that corresponds to the 
+ * courseId in the request body, return error if unauthorized
  */
 exports.requireInstructorMatchesBody = async function (req, res, next) {
   try {
-    // TODO: ONCE COURSES ARE IMPLEMENTED, ENSURE MATCHING INSTRUCTOR ID
-    if (await isAdmin(req.user) || (await isInstructor(req.user))) {// && req.user == await getCourseById(req.body.courseId).instructorId)) {
+    const course = await Course.findByPk(req.body.courseId)
+    if (!course) {
+      res.status(400).send({ error: "courseId is not valid" })
+    }
+    if (
+      req.role === "admin" ||
+      (req.role === "instructor" && course.instructorId === req.user)
+    ) {
       // Authorized user: either admin or matching instructor
       next()
     } else {
-      // Unauthorized: user is not admin or matching instructor and is trying to access another user's info
+      // Unauthorized: user is not admin or matching instructor
       res.status(403).send({
         error: "Not authorized to access the specified resource"
       })
