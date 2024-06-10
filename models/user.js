@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs")
 
 const sequelize = require('../lib/sequelize')
 const { Course } = require('./course')
+const { Assignment } = require('./assignment')
 
 const User = sequelize.define('user', {
     name: { type: DataTypes.STRING, allowNull: false },
@@ -163,6 +164,44 @@ exports.requireInstructorMatchesParams = async function (req, res, next) {
         error: `Requested resource "${req.originalUrl}" does not exist`
       })
     }
+    if (
+      req.role === "admin" ||
+      (req.role === "instructor" && course.instructorId === req.user)
+    ) {
+      // Authorized user: either admin or matching instructor
+      next()
+    } else {
+      // Unauthorized: user is not admin or matching instructor
+      res.status(403).send({
+        error: "Not authorized to access the specified resource"
+      })
+    }
+  } catch (e) {
+    next(e)
+  }
+}
+
+
+/*
+ * Require the user is an admin, or an instructor matching the instructorId that corresponds to the 
+ * courseId in the request params, return error if unauthorized
+ */
+exports.requireInstructorMatchesAssignment = async function (req, res, next) {
+  try {
+    const assignment = await Assignment.findByPk(req.params.assignmentId)
+    if (!assignment) {
+      res.status(404).send({
+        error: `Requested resource "${req.originalUrl}" does not exist`
+      })
+    }
+
+    const course = await Course.findByPk(assignment.courseId)
+    if (!course) {
+      res.status(404).send({
+        error: `Requested resource "${req.originalUrl}" does not exist`
+      })
+    }
+
     if (
       req.role === "admin" ||
       (req.role === "instructor" && course.instructorId === req.user)

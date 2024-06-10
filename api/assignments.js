@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const { getAssignmentById, Assignment, AssignmentClientFields } = require('../models/assignment')
-const { requireInstructorMatchesBody } = require('../models/user')
+const { requireInstructorMatchesBody, requireInstructorMatchesAssignment } = require('../models/user')
 const { Submission } = require('../models/submission')
 const { Course } = require('../models/course')
 const { Enrollment } = require('../models/enrollment')
@@ -111,7 +111,7 @@ router.patch(
 router.delete(
     '/:assignmentId',
     requireAuthentication,
-    requireInstructorMatchesBody,
+    requireInstructorMatchesAssignment,
     async function (req, res, next) {
         const assignmentId = req.params.assignmentId
         try {
