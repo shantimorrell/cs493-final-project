@@ -64,9 +64,8 @@ router.get(
   requireAuthentication, 
   requireUserMatchesParams, 
   async function (req, res, next) {
-    console.log("req.user", req.user, req.role)
     try {
-      const user = await getUserById(req.params.userId, false)
+      const user = await getUserById(req.params.userId, req.role, false)
       if (user) {
         res.status(200).send(user)
       } else {

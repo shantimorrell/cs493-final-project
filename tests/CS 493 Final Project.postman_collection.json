@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "fc51b4c2-fe87-4a96-9dc4-ac0bf6c5c3f7",
+		"_postman_id": "e98cc402-5847-4cec-81c7-bbdb62f00ed1",
 		"name": "CS 493 Final Project",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "34250222"
+		"_exporter_id": "34417828"
 	},
 	"item": [
 		{
@@ -14,19 +14,6 @@
 					"item": [
 						{
 							"name": "Login student",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"var jsonData = pm.response.json();\r",
-											"pm.collectionVariables.set(\"JWT\", jsonData.token);"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -54,19 +41,6 @@
 						},
 						{
 							"name": "Login instructor",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"var jsonData = pm.response.json();\r",
-											"pm.collectionVariables.set(\"JWT\", jsonData.token);"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -94,25 +68,39 @@
 						},
 						{
 							"name": "Login admin",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"var jsonData = pm.response.json();\r",
-											"pm.collectionVariables.set(\"JWT\", jsonData.token);"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
 							"request": {
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"email\": \"minad@oregonstate.edu\",\n    \"password\": \"hunter2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/users/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"users",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login - invalid req",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"turingal@oregonstate.edu\",\n    \"someotherfield\": \"somevalue\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -214,144 +202,15 @@
 								}
 							},
 							"response": []
-						}
-					]
-				},
-				{
-					"name": "submissions",
-					"item": [
+						},
 						{
-							"name": "Post submission",
+							"name": "Add student - invalid req",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
 								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "userId",
-											"value": "7",
-											"type": "text"
-										},
-										{
-											"key": "file",
-											"type": "file",
-											"src": "/C:/Users/nurua/Documents/CS493/assignment-4-Cerberus168/test_images/armadillo_lizard.jpg"
-										}
-									]
-								},
-								"url": {
-									"raw": "{{baseUrl}}/assignments/:assignmentId/submissions",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"assignments",
-										":assignmentId",
-										"submissions"
-									],
-									"variable": [
-										{
-											"key": "assignmentId",
-											"value": "2"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "View submissions for an assignment",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/assignments/:assignmentId/submissions",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"assignments",
-										":assignmentId",
-										"submissions"
-									],
-									"variable": [
-										{
-											"key": "assignmentId",
-											"value": "2"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Download submission",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/media/submissions/d4a05a478347b54f70f67d721dae7fe4.jpg",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"media",
-										"submissions",
-										"d4a05a478347b54f70f67d721dae7fe4.jpg"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "New Request",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "PATCH",
-								"header": [],
-								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"grade\": 45\r\n}",
+									"raw": "{\n    \"name\": \"Random Student\",\n    \"email\": \"randomstudent@oregonstate.edu\",\n    \"role\": \"student\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -359,19 +218,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/submissions/:submissionId",
+									"raw": "{{baseUrl}}/users",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
-										"submissions",
-										":submissionId"
-									],
-									"variable": [
-										{
-											"key": "submissionId",
-											"value": "1"
-										}
+										"users"
 									]
 								}
 							},
@@ -402,6 +254,30 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get a user's info - nonexistent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/:userid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userid"
+							],
+							"variable": [
+								{
+									"key": "userid",
+									"value": "1000"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -409,197 +285,990 @@
 			"name": "assignments",
 			"item": [
 				{
-					"name": "Get an assignment's info",
+					"name": "Add assignment",
+					"item": [
+						{
+							"name": "Add assignment",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"CS 493 Final Project\",\n    \"due\": \"2024-06-10T23:59:59.000Z\",\n    \"points\": 100,\n    \"courseId\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/assignments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add assignment - invalid",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"CS 493 Final Project\",\n    \"due\": \"2024-06-10T23:59:59.000Z\",\n    \"points\": 100,\n    \"courseId\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/assignments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get info about an assignment",
+					"item": [
+						{
+							"name": "Get an assignment's info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:assignmentid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":assignmentid"
+									],
+									"variable": [
+										{
+											"key": "assignmentid",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get an assignment's info - nonexistent",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:assignmentid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":assignmentid"
+									],
+									"variable": [
+										{
+											"key": "assignmentid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Delete assignment",
+					"item": [
+						{
+							"name": "Delete an assignment",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:assignmentid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":assignmentid"
+									],
+									"variable": [
+										{
+											"key": "assignmentid",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete an assignment - nonexistent id",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:assignmentid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":assignmentid"
+									],
+									"variable": [
+										{
+											"key": "assignmentid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Update assignment",
+					"item": [
+						{
+							"name": "Update assignment",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Assignment 1\",\n    \"points\": 100,\n    \"courseId\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:assignmentid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":assignmentid"
+									],
+									"variable": [
+										{
+											"key": "assignmentid",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update assignment - invalid fields",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"unknownfield\": \"value\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:assignmentid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":assignmentid"
+									],
+									"variable": [
+										{
+											"key": "assignmentid",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update assignment - nonexistent id",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Testing\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:assignmentid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":assignmentid"
+									],
+									"variable": [
+										{
+											"key": "assignmentid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "submissions",
+			"item": [
+				{
+					"name": "Post submission",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "userId",
+									"value": "7",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/shantimorrell/Desktop/23-24/cs493/assignment-4-shantimorrell/dog.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/assignments/:assignmentId/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments",
+								":assignmentId",
+								"submissions"
+							],
+							"variable": [
+								{
+									"key": "assignmentId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View submissions for an assignment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/assignments/:assignmentId/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments",
+								":assignmentId",
+								"submissions"
+							],
+							"variable": [
+								{
+									"key": "assignmentId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download submission",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/media/submissions/d4a05a478347b54f70f67d721dae7fe4.jpg",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"submissions",
+								"d4a05a478347b54f70f67d721dae7fe4.jpg"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"grade\": 45\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/submissions/:submissionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"submissions",
+								":submissionId"
+							],
+							"variable": [
+								{
+									"key": "submissionId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "courses",
+			"item": [
+				{
+					"name": "add course",
+					"item": [
+						{
+							"name": "Add course",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"subject\": \"CS\",\n  \"number\": \"493\",\n  \"title\": \"Cloud Application Development\",\n  \"term\": \"sp22\",\n  \"instructorId\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/courses",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add course - invalid",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"subject\": \"CS\",\n  \"title\": \"Cloud Application Development\",\n  \"term\": \"sp22\",\n  \"instructorId\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/courses",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "get course info",
+					"item": [
+						{
+							"name": "Get course info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "4"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get course info - nonexistent",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "update course",
+					"item": [
+						{
+							"name": "Update course",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subject\": \"CS\",\n    \"number\": \"325\",\n    \"title\": \"Analysis of Algorithms\",\n    \"term\": \"sp22\",\n    \"instructorId\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update course - invalid",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"somefield\": \"somevalue\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update course - nonexistent",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subject\": \"CS\",\n    \"number\": \"325\",\n    \"title\": \"Analysis of Algorithms\",\n    \"term\": \"sp22\",\n    \"instructorId\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "delete course",
+					"item": [
+						{
+							"name": "delete course",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "4"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete course - nonexistent",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "get students in course",
+					"item": [
+						{
+							"name": "Get student list",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid/students",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid",
+										"students"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get student list - nonexistent",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid/students",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid",
+										"students"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "update enrollment for course",
+					"item": [
+						{
+							"name": "Update enrollment",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"add\": [\n    \"1\",\n    \"2\"\n  ],\n  \"remove\": [\n    \"7\"\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid/students",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid",
+										"students"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update enrollment - invalid",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid/students",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid",
+										"students"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update enrollment - nonexistent",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid/students",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid",
+										"students"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "get course roster",
+					"item": [
+						{
+							"name": "Download roster",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid/roster",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid",
+										"roster"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Download roster - nonexistent",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid/roster",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid",
+										"roster"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "get course assignments",
+					"item": [
+						{
+							"name": "Get course assignments",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid/assignments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid",
+										"assignments"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get course assignments - nonexistent",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/courses/:courseid/assignments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"courses",
+										":courseid",
+										"assignments"
+									],
+									"variable": [
+										{
+											"key": "courseid",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get list of courses",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/assignments/:assignmentid",
+							"raw": "{{baseUrl}}/courses",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"assignments",
-								":assignmentid"
-							],
-							"variable": [
-								{
-									"key": "assignmentid",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete an assignment",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/assignments/:assignmentid",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"assignments",
-								":assignmentid"
-							],
-							"variable": [
-								{
-									"key": "assignmentid",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete an assignment - nonexistent id",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/assignments/:assignmentid",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"assignments",
-								":assignmentid"
-							],
-							"variable": [
-								{
-									"key": "assignmentid",
-									"value": "1000"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add assignment",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"CS 493 Final Project\",\n    \"due\": \"2024-06-10T23:59:59.000Z\",\n    \"points\": 100\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/assignments",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"assignments"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update assignment",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Assignment 1\",\n    \"points\": 100\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/assignments/:assignmentid",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"assignments",
-								":assignmentid"
-							],
-							"variable": [
-								{
-									"key": "assignmentid",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update assignment - invalid fields",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"unknownfield\": \"value\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/assignments/:assignmentid",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"assignments",
-								":assignmentid"
-							],
-							"variable": [
-								{
-									"key": "assignmentid",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update assignment - nonexistent id",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Testing\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/assignments/:assignmentid",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"assignments",
-								":assignmentid"
-							],
-							"variable": [
-								{
-									"key": "assignmentid",
-									"value": "1000"
-								}
+								"courses"
 							]
 						}
 					},
@@ -613,7 +1282,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE3ODgyNDk1LCJleHAiOjE3MTc5Njg4OTV9.tNQZS2155QOUez2GrdpFjG5VeJWdYPwDdCNOpRjek2k",
+				"value": "{{JWT}}",
 				"type": "string"
 			}
 		]
