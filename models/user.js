@@ -1,8 +1,7 @@
-const { DataTypes, UniqueConstraintError, ValidationError } = require('sequelize')
+const { DataTypes, UniqueConstraintError, ValidationError, where } = require('sequelize')
 const bcrypt = require("bcryptjs")
 
 const sequelize = require('../lib/sequelize')
-const { Assignment } = require('./assignment')
 const { Course } = require('./course')
 
 const User = sequelize.define('user', {
@@ -19,7 +18,7 @@ const User = sequelize.define('user', {
 })
 
 
-User.hasMany(Course)
+User.hasMany(Course, { foreignKey: { allowNull: false, name: "instructorId" } })
 Course.belongsTo(User, { foreignKey: { allowNull: false, name: "instructorId" } })
 
 
@@ -57,9 +56,10 @@ exports.insertNewUser = async function (req, res, next) {
 /*
  * Get a user by their ID. includePassword specifies whether password is returned in response.
  */
-async function getUserById(id, includePassword) {
+async function getUserById(id, role, includePassword) {
   let excludedAttributes = includePassword ? [] : ['password']
   const user = await User.findByPk(id, {
+    include: Course,
     attributes: {
       exclude: excludedAttributes
     }
