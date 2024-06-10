@@ -34,16 +34,16 @@ const upload = multer({
 })
 
 router.get("/:assignmentId", async function (req, res, next) {
-  try {
-    const user = await getAssignmentById(req.params.assignmentId)
-    if (user) {
-      res.status(200).send(user)
-    } else {
-      next()
+    try {
+        const user = await getAssignmentById(req.params.assignmentId)
+        if (user) {
+            res.status(200).send(user)
+        } else {
+            next()
+        }
+    } catch (e) {
+        next(e)
     }
-  } catch(e) {
-    next(e)
-  }
 })
 
 
@@ -52,21 +52,21 @@ router.get("/:assignmentId", async function (req, res, next) {
  * Route to add a new assignment.
  */
 router.post(
-  '/', 
-  requireAuthentication, 
-  requireInstructorMatchesBody, 
-  async function (req, res, next) {
-    try {
-      const assignment = await Assignment.create(req.body, AssignmentClientFields)
-      res.status(201).send({ id: assignment.id })
-    } catch (e) {
-      if (e instanceof ValidationError) {
-        res.status(400).send({ error: "Request body must contain courseId, title, due, and points" })
-      } else {
-        next(e)
-      }
+    '/',
+    requireAuthentication,
+    requireInstructorMatchesBody,
+    async function (req, res, next) {
+        try {
+            const assignment = await Assignment.create(req.body, AssignmentClientFields)
+            res.status(201).send({ id: assignment.id })
+        } catch (e) {
+            if (e instanceof ValidationError) {
+                res.status(400).send({ error: "Request body must contain courseId, title, due, and points" })
+            } else {
+                next(e)
+            }
+        }
     }
-  }
 )
 
 
@@ -74,34 +74,34 @@ router.post(
  * Route to update data for an assignment.
  */
 router.patch(
-  '/:assignmentId', 
-  requireAuthentication, 
-  requireInstructorMatchesBody, 
-  async function (req, res, next) {
-    const assignmentId = req.params.assignmentId
+    '/:assignmentId',
+    requireAuthentication,
+    requireInstructorMatchesBody,
+    async function (req, res, next) {
+        const assignmentId = req.params.assignmentId
 
-    // Check request body is present and there is at least one matching field, otherwise return error
-    const matchingFields = Object.keys(req.body)?.filter(value => AssignmentClientFields.includes(value));
-    if (!req.body || matchingFields.length === 0) {
-      res.status(400).send({ error: "Request must contain fields to update: courseId, title, points, or due" })
-    }
+        // Check request body is present and there is at least one matching field, otherwise return error
+        const matchingFields = Object.keys(req.body)?.filter(value => AssignmentClientFields.includes(value));
+        if (!req.body || matchingFields.length === 0) {
+            res.status(400).send({ error: "Request must contain fields to update: courseId, title, points, or due" })
+        }
 
-    try {
-      const result = await Assignment.update(req.body, {
-        where: { id: assignmentId },
-        fields: AssignmentClientFields
-      })
-      if (result[0] > 0) {
-        // Assignment successfully updated
-        res.status(200).send()
-      } else {
-        // No assignment with specified id exists, return 404 error
-        next()
-      }
-    } catch (e) {
-      next(e)
+        try {
+            const result = await Assignment.update(req.body, {
+                where: { id: assignmentId },
+                fields: AssignmentClientFields
+            })
+            if (result[0] > 0) {
+                // Assignment successfully updated
+                res.status(200).send()
+            } else {
+                // No assignment with specified id exists, return 404 error
+                next()
+            }
+        } catch (e) {
+            next(e)
+        }
     }
-  }
 )
 
 
@@ -109,72 +109,92 @@ router.patch(
  * Route to delete an assignment.
  */
 router.delete(
-  '/:assignmentId', 
-  requireAuthentication, 
-  requireInstructorMatchesBody, 
-  async function (req, res, next) {
-    const assignmentId = req.params.assignmentId
-    try {
-      const result = await Assignment.destroy({ where: { id: assignmentId }})
-      if (result > 0) {
-        res.status(204).send()
-      } else {
-        next()
-      }
-    } catch (e) {
-      next(e)
+    '/:assignmentId',
+    requireAuthentication,
+    requireInstructorMatchesBody,
+    async function (req, res, next) {
+        const assignmentId = req.params.assignmentId
+        try {
+            const result = await Assignment.destroy({ where: { id: assignmentId } })
+            if (result > 0) {
+                res.status(204).send()
+            } else {
+                next()
+            }
+        } catch (e) {
+            next(e)
+        }
     }
-  }
 )
 
 router.post("/:assignmentId/submissions", requireAuthentication,
     upload.single("file"),
     async function (req, res, next) {
-    try {
-        const student = req.body.userId
-        const assignment = await Assignment.findByPk(req.params.assignmentId)
-        const course = assignment.courseId
-        const enrollment = await Enrollment.findOne({ where: { courseId: course, studentId: student } })
-        if (enrollment !== null && (req.user == student || req.role === 'admin')) {
-            try {
-                const submission = await Submission.create({
-                    userId: student,
-                    assignmentId: req.params.assignmentId,
-                    file: req.file.filename
-                }
-                )
-                res.status(201).send({ id: submission.id })
-            } catch (e) {
-                if (e instanceof ValidationError) {
-                    res.status(400).send({ error: e.message })
-                } else {
-                    next(e)
-                }
-            }
-        } else {
-            fs.unlink(req.file.path, err => {
-                if (err) {
-                    console.error(`Unable to remove file with path ${req.file.path}`)
-                }
-            })
-            if (enrollment === null) {
-                res.status(400).send({
-                    error: "Assignments can only be submitted for courses a student is enrolled in."
+        try {
+            if (!req.body && req.body.userId) {
+                fs.unlink(req.file.path, err => {
+                    if (err) {
+                        console.error(`Unable to remove file with path ${req.file.path}`)
+                    }
                 })
+                res.status(402).send({
+                    error: "No valid submission object detected."
+                })
+            }
+            const student = req.body.userId
+            const assignment = await Assignment.findByPk(req.params.assignmentId)
+            if (assignment == null) {
+                res.status(404).send({
+                    error: "Assignment not found."
+                })
+            }
+            const course = assignment.courseId
+            const enrollment = await Enrollment.findOne({ where: { courseId: course, studentId: student } })
+            if (enrollment !== null && (req.user == student || req.role === 'admin')) {
+                try {
+                    const submission = await Submission.create({
+                        userId: student,
+                        assignmentId: req.params.assignmentId,
+                        file: req.file.filename
+                    }
+                    )
+                    res.status(201).send({ id: submission.id })
+                } catch (e) {
+                    if (e instanceof ValidationError) {
+                        res.status(400).send({ error: e.message })
+                    } else {
+                        next(e)
+                    }
+                }
             } else {
-                res.status(403).send({
-                    error: "Assignments can only be submitted by the student they are linked to, or an administrator."
+                fs.unlink(req.file.path, err => {
+                    if (err) {
+                        console.error(`Unable to remove file with path ${req.file.path}`)
+                    }
                 })
+                if (enrollment === null) {
+                    res.status(400).send({
+                        error: "Assignments can only be submitted for courses a student is enrolled in."
+                    })
+                } else {
+                    res.status(403).send({
+                        error: "Assignments can only be submitted by the student they are linked to, or an administrator."
+                    })
+                }
             }
+        } catch (e) {
+            next(e)
         }
-    } catch (e) {
-        next(e)
-    }
-})
+    })
 
 router.get("/:assignmentId/submissions", requireAuthentication, async function (req, res, next) {
     try {
         const assignment = await Assignment.findByPk(req.params.assignmentId)
+        if (assignment == null) {
+            res.status(404).send({
+                error: "Assignment not found."
+            })
+        }
         const course = await Course.findByPk(assignment.courseId)
         const instructor = course.instructorId
         if (req.user == instructor || req.role === 'admin') {

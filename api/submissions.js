@@ -15,11 +15,26 @@ const router = Router()
  */
 router.patch("/:submissionId", requireAuthentication, async function (req, res, next) {
     try {
+        if (!req.body.grade) {
+            res.status(400).send({
+                error: "No valid fields detected."
+            })
+        }
         const submission = await Submission.findByPk(req.params.submissionId)
+        if (submission == null) {
+            res.status(404).send({
+                error: "Submission not found."
+            })
+        }
         const assignment = await Assignment.findByPk(submission.assignmentId)
+        if (assignment == null) {
+            res.status(500).send({
+                error: "Submission doesn't correspond to valid assignment."
+            })
+        }
         const course = await Course.findByPk(assignment.courseId)
         const instructor = course.instructorId
-        if (((req.user == instructor && req.role === 'instructor') || req.role === 'admin') && req.body.grade) {
+        if (((req.user == instructor && req.role === 'instructor') || req.role === 'admin')) {
             try {
                 const result = await Submission.update(req.body, {
                     where: { id: req.params.submissionId },
