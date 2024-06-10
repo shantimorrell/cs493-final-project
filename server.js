@@ -27,18 +27,36 @@ const { Submission } = require('./models/submission')
 const { Assignment } = require('./models/assignment')
 const { Course } = require('./models/course')
 
+const jwt = require("jsonwebtoken")
+
+const secretKey = "CS 493 Final Project"
+
 const redisClient = redis.createClient({
     url: `redis://${redisHost}:${redisPort}`
 })
 
-const rateLimits = 5
+
+let rateLimits = 5
 const rateLimitTime = 60000
 async function rateLimit(req, res, next) {
+    const authHeader = req.get("Authorization") || ""
+    const authHeaderParts = authHeader.split(" ")
+    const token = authHeaderParts[0] === "Bearer" ? authHeaderParts[1] : null
+    try {
+        const payload = jwt.verify(token, secretKey)
+        req.user = payload.sub
+        req.role = payload.role
+        if (req.role == 'admin' || req.role == 'instructor' || req.role == 'student') {
+            rateLimits = 10
+        }
+    } catch (e) {
+        console.log(e)
+    }
     const ip = req.ip
     let tokenBucket
     try {
         tokenBucket = await redisClient.hGetAll(ip)
-    } catch(e) {
+    } catch (e) {
         next()
         return
     }
