@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const { Course } = require('../models/course')
 const { Enrollment } = require('../models/enrollment')
-const { User } = require('../models/user')
+const { User, requireInstructorMatchesBody, requireInstructorMatchesParams } = require('../models/user')
 const { Assignment } = require('../models/assignment')
 const { validateAgainstSchema } = require('../lib/validation')
 const { requireAuthentication } = require('../lib/auth')
@@ -18,7 +18,7 @@ courseSchema = {
 
 enrollmentSchema = {
     add: { required: true },
-    delete: { required: true }
+    remove: { required: true }
 }
 
 /*
@@ -87,7 +87,7 @@ router.get('/:id', async function (req, res, next) {
                 next()
             }
         } else {
-            res.status(400).send({
+            res.status(404).send({
                 error: "no course with that id was found"
             })
         }
@@ -96,31 +96,23 @@ router.get('/:id', async function (req, res, next) {
     }
 })
 
-router.get('/:id/students', requireAuthentication, async function (req, res, next) {
+router.get('/:id/students', requireAuthentication, requireInstructorMatchesParams, async function (req, res, next) {
     try {
         const courseId = parseInt(req.params.id)
         const enrollment = await Enrollment.findAll({ where: { courseId: courseId } })
-        const course = await Course.findByPk(courseId)
-        const instructor = course.instructorId
-        if ((req.user == instructor && req.role == 'instructor' && instructor == course.instructorId) || req.role == 'admin') {
-            if (enrollment.length > 0) {
-                const users = await User.findAll()
-                const id = []
-                for (let i = 0; i < enrollment.length; i++) {
-                    id[id.length] = enrollment[i].studentId
-                }
-                const students = isStudent(id, users)
-                res.status(200).send({
-                    students: students
-                })
-            } else {
-                res.status(404).send({
-                    error: "no course with that id found"
-                })
+        if (enrollment.length > 0) {
+            const users = await User.findAll()
+            const id = []
+            for (let i = 0; i < enrollment.length; i++) {
+                id[id.length] = enrollment[i].studentId
             }
+            const students = isStudent(id, users)
+            res.status(200).send({
+                students: students
+            })
         } else {
-            res.status(403).send({
-                error: "must be admin or instructor"
+            res.status(404).send({
+                error: "no course with that id found"
             })
         }
     } catch (e) {
@@ -143,35 +135,27 @@ function isStudent(num, arr) {
     return students
 }
 
-router.get('/:id/roster', requireAuthentication, async function (req, res, next) {
+router.get('/:id/roster', requireAuthentication, requireInstructorMatchesParams, async function (req, res, next) {
     try {
         const courseId = parseInt(req.params.id)
         const enrollment = await Enrollment.findAll({ where: { courseId: courseId } })
-        const course = await Course.findByPk(courseId)
-        const instructor = course.instructorId
-        if ((req.user == instructor && req.role == 'instructor' && instructor == course.instructorId) || req.role == 'admin') {
-            if (enrollment.length > 0) {
-                const users = await User.findAll()
-                const id = []
-                for (let i = 0; i < enrollment.length; i++) {
-                    id[id.length] = enrollment[i].studentId
-                }
-                const students = isStudent(id, users)
-                let csv = "name, studentId, email \n"
-                for (let i = 0; i < students.length; i++) {
-                    csv += `${students[i].name}, ${students[i].id}, ${students[i].email}\n`
-                }
-                res.setHeader('Content-Type', 'text/csv')
-                res.setHeader('Content-Disposition', 'attachment; filename-roster.csv')
-                res.status(200).send(csv)
-            } else {
-                res.status(404).send({
-                    error: "no course with that id found"
-                })
+        if (enrollment.length > 0) {
+            const users = await User.findAll()
+            const id = []
+            for (let i = 0; i < enrollment.length; i++) {
+                id[id.length] = enrollment[i].studentId
             }
+            const students = isStudent(id, users)
+            let csv = "name, studentId, email \n"
+            for (let i = 0; i < students.length; i++) {
+                csv += `${students[i].name}, ${students[i].id}, ${students[i].email}\n`
+            }
+            res.setHeader('Content-Type', 'text/csv')
+            res.setHeader('Content-Disposition', 'attachment; filename-roster.csv')
+            res.status(200).send(csv)
         } else {
-            res.status(403).send({
-                error: "must be admin or instructor"
+            res.status(404).send({
+                error: "no course with that id found"
             })
         }
     } catch (e) {
@@ -188,7 +172,7 @@ router.get('/:id/assignments', async function (req, res, next) {
                 assignments: assignment
             })
         } else {
-            res.status(400).send({
+            res.status(404).send({
                 error: "no course found with that id"
             })
         }
@@ -225,45 +209,38 @@ router.post('/', requireAuthentication, async function (req, res, next) {
     }
 })
 
-router.post('/:id/students', requireAuthentication, async function (req, res, next) {
+router.post('/:id/students', requireAuthentication, requireInstructorMatchesParams, async function (req, res, next) {
     try {
         const courseId = parseInt(req.params.id)
         const request = await req.body
         const add = request.add
-        const remove = request.delete
+        const remove = request.remove
         const course = await Course.findByPk(courseId)
-        const instructor = course.instructorId
-        if ((req.user == instructor && req.role == 'instructor' && instructor == course.instructorId) || req.role == 'admin') {
-            if (validateAgainstSchema(request, enrollmentSchema)) {
-                if (course) {
-                    for (let i = 0; i < add.length; i++) {
-                        await Enrollment.create({
-                            studentId: add[i],
-                            courseId: courseId
-                        })
-                    }
-                    for (let i = 0; i < remove.length; i++) {
-                        await Enrollment.destroy({
-                            where: {
-                                studentId: remove[i],
-                                courseId: courseId
-                            }
-                        })
-                    }
-                    res.status(200).send()
-                } else {
-                    res.status(404).send({
-                        error: "course not found"
+        if (validateAgainstSchema(request, enrollmentSchema)) {
+            if (course) {
+                for (let i = 0; i < add.length; i++) {
+                    await Enrollment.create({
+                        studentId: add[i],
+                        courseId: courseId
                     })
                 }
+                for (let i = 0; i < remove.length; i++) {
+                    await Enrollment.destroy({
+                        where: {
+                            studentId: remove[i],
+                            courseId: courseId
+                        }
+                    })
+                }
+                res.status(200).send()
             } else {
-                res.status(400).send({
-                    error: "body is not a valid object"
+                res.status(404).send({
+                    error: "course not found"
                 })
             }
         } else {
-            res.status(403).send({
-                error: "must be admin or instructor"
+            res.status(400).send({
+                error: "body is not a valid object"
             })
         }
     } catch (e) {
@@ -271,7 +248,7 @@ router.post('/:id/students', requireAuthentication, async function (req, res, ne
     }
 })
 
-router.patch('/:id', async function (req, res, next) {
+router.patch('/:id', requireAuthentication, requireInstructorMatchesParams, async function (req, res, next) {
     const request = await req.body
     const courseId = parseInt(req.params.id)
     const course = await Course.findByPk(courseId)

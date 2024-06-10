@@ -17,7 +17,7 @@ const sequelize = require('./lib/sequelize')
 const app = express()
 const port = process.env.PORT || 8000
 
-const { requireAuthentication } = require('./lib/auth')
+const { requireAuthentication, getUserFromAuth } = require('./lib/auth')
 
 const redis = require('redis')
 const redisHost = process.env.REDIS_HOST || "localhost"
@@ -36,54 +36,61 @@ const redisClient = redis.createClient({
 })
 
 
-let rateLimits = 5
-const rateLimitTime = 60000
+
+const rateLimitMaxReqsUnauth = 5
+const rateLimitMaxReqsAuth = 10
+const rateLimitWindowMs = 60000
+
 async function rateLimit(req, res, next) {
-    const authHeader = req.get("Authorization") || ""
-    const authHeaderParts = authHeader.split(" ")
-    const token = authHeaderParts[0] === "Bearer" ? authHeaderParts[1] : null
-    try {
-        const payload = jwt.verify(token, secretKey)
-        req.user = payload.sub
-        req.role = payload.role
-        if (req.role == 'admin' || req.role == 'instructor' || req.role == 'student') {
-            rateLimits = 10
-        }
-    } catch (e) {
-        console.log(e)
-    }
+
+
     const ip = req.ip
+    const user = getUserFromAuth(req)?.toString() || null
+  
+    let userRateLimit = rateLimitMaxReqsUnauth
+  
     let tokenBucket
     try {
+      if (user) {
+        userRateLimit = rateLimitMaxReqsAuth
+        tokenBucket = await redisClient.hGetAll(user)
+      } else {
         tokenBucket = await redisClient.hGetAll(ip)
+      }
     } catch (e) {
-        next()
-        return
+      next()
+      return
     }
     tokenBucket = {
-        tokens: parseFloat(tokenBucket.tokens) || rateLimits,
-        last: parseInt(tokenBucket.last) || Date.now()
+      tokens: parseFloat(tokenBucket.tokens) || userRateLimit,
+      last: parseInt(tokenBucket.last) || Date.now()
     }
-
+  
     const timestamp = Date.now()
-    const ellapsedTime = timestamp - tokenBucket.last
-    const refreshRate = rateLimits / rateLimitTime
-    tokenBucket.tokens += ellapsedTime * refreshRate
-    tokenBucket.tokens = Math.min(rateLimits, tokenBucket.tokens)
+    const elapsedTimeMs = timestamp - tokenBucket.last
+    const refreshRate = userRateLimit / rateLimitWindowMs
+    tokenBucket.tokens += elapsedTimeMs * refreshRate
+    tokenBucket.tokens = Math.min(userRateLimit, tokenBucket.tokens)
     tokenBucket.last = timestamp
-
+  
     if (tokenBucket.tokens >= 1) {
-        console.log("TOKENS: ", tokenBucket.tokens)
-        tokenBucket.tokens -= 1
-        await redisClient.hSet(ip, [
-            ['tokens', tokenBucket.tokens],
-            ['last', tokenBucket.last]
+      tokenBucket.tokens -= 1
+      if (user) {
+        await redisClient.hSet(user, [
+          ['tokens', tokenBucket.tokens],
+          ['last', tokenBucket.last]
         ])
-        next()
+      } else {
+        await redisClient.hSet(ip, [
+          ['tokens', tokenBucket.tokens],
+          ['last', tokenBucket.last]
+        ])
+      }
+      next()
     } else {
-        res.status(429).send({
-            error: "too many actions per minute"
-        })
+      res.status(429).send({
+        err: "Too many requests per minute"
+      })
     }
 }
 app.use(rateLimit)
